@@ -1,1 +1,7 @@
 .idea/
+history.json
+.DS_Store
+
+*.app
+FyneApp.toml
+appIcon.png
