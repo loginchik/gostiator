@@ -8,7 +8,7 @@ import (
 
 func setupUI() {
 	var application = app.New()
-	var wind = application.NewWindow("Генератор")
+	var wind = application.NewWindow(application.Metadata().Name)
 	wind.SetCloseIntercept(func() {
 		if len(application.Driver().AllWindows()) > 1 {
 			dialog.ShowConfirm(
@@ -24,7 +24,7 @@ func setupUI() {
 		}
 	})
 	wind.SetContent(tabs.AddWindow(application))
-	wind.SetMainMenu(mainMenu(application))
+	wind.SetMainMenu(MainMenu(application))
 	wind.Show()
 	application.Run()
 }

@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/widget"
+	"gostCituations/ui/customLayouts"
+	"math"
 	"strings"
 )
 
@@ -79,15 +80,15 @@ func (pf *PersonForm) Full() bool {
 	return !(pf.FirstName.IsEmpty()) && !(pf.LastName.IsEmpty())
 }
 
-func PeopleContainer(people []PersonForm, title string, gridCols int) *fyne.Container {
-	var titleLabel = widget.NewLabel(title)
-	var peopleFields = container.NewAdaptiveGrid(gridCols)
+func PeopleContainer(people []PersonForm) *fyne.Container {
+	var gridColumns = int(math.Min(float64(len(people)), 3))
+	var peopleFields = container.NewAdaptiveGrid(gridColumns)
 	for _, person := range people {
-		var personContainerLayout = NewAdaptiveGridLayoutRatio([]float32{0.3, 0.7})
+		var personContainerLayout = customLayouts.NewRatioLayout(0.3, 0.7)
 		var personContainer = container.New(personContainerLayout, person.FirstName, person.LastName)
 		peopleFields.Add(personContainer)
 	}
-	return container.NewVBox(titleLabel, peopleFields)
+	return container.NewVBox(peopleFields)
 }
 
 func FieldsEmpty(fields []PersonForm) bool {

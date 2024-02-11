@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/widget"
+	"gostCituations/ui/customLayouts"
 )
 
 /* ------------ Organization Structure  ------------ */
@@ -58,15 +58,14 @@ func (of *OrganizationForm) Full() bool {
 	return !((of.Name.TrimText() == "") && (of.Address.TrimText() == ""))
 }
 
-func OrganizationsContainer(organizations []OrganizationForm, title string) *fyne.Container {
-	var titleLabel = widget.NewLabel(title)
+func OrganizationsContainer(organizations []OrganizationForm) *fyne.Container {
 	var organizationsFields = container.NewAdaptiveGrid(len(organizations))
 	for _, org := range organizations {
-		var orgLayout = NewAdaptiveGridLayoutRatio([]float32{0.6, 0.4})
+		var orgLayout = customLayouts.NewRatioLayout(0.6, 0.4)
 		var orgContainer = container.New(orgLayout, org.Name, org.Address)
 		organizationsFields.Add(orgContainer)
 	}
-	return container.NewVBox(titleLabel, organizationsFields)
+	return container.NewVBox(organizationsFields)
 }
 
 func OrganizationsFromForm(fields []OrganizationForm) []Organization {

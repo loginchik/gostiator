@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/widget"
+	"gostCituations/ui/customLayouts"
 	"strings"
 	"time"
 )
@@ -70,34 +70,28 @@ func (form *Article) ValidateForm() bool {
 }
 
 func (form *Article) Citation() string {
-	var authorTitlePart, authorsDOIPart, journalInfoPart string
+	var citationParts []string
 
 	// author title
-	var firstPartElements []string
 	var authors = PeopleFromForm(form.Authors)
 	if len(authors) < 4 {
-		firstPartElements = append(firstPartElements, authors[0].SurnameInitials())
+		citationParts = append(citationParts, authors[0].SurnameInitials())
 	}
-	firstPartElements = append(firstPartElements, form.Title.TrimText())
-	authorTitlePart = strings.Join(firstPartElements, " ")
-	if string(authorTitlePart[len(authorTitlePart)-1]) != "." {
-		authorTitlePart += "."
-	}
+	citationParts = append(citationParts, form.Title.TrimText())
+
 	// / authors — doi part
-	var secondPartElements = []string{"/"}
-	secondPartElements = append(secondPartElements, ListPeople(authors, 3))
+	citationParts = append(citationParts, "/", ListPeople(authors, 3))
 	if !(form.DOI.TrimText() == "") {
-		secondPartElements = append(secondPartElements, fmt.Sprintf("— DOI: %s.", form.DOI.TrimText()))
+		citationParts = append(citationParts, fmt.Sprintf("— DOI: %s.", form.DOI.TrimText()))
 	}
 	if !(form.URL.TrimText() == "") {
-		secondPartElements = append(secondPartElements, "— Текст: электронный.")
+		citationParts = append(citationParts, "— Текст: электронный.")
 	}
-	authorsDOIPart = strings.Join(secondPartElements, " ")
 
 	// journal info part
-	var thirdPartElements = []string{"//"}
-	thirdPartElements = append(thirdPartElements, form.ParentTitle.TrimText())
-	thirdPartElements = append(thirdPartElements, fmt.Sprintf("— %d.", form.YearPublished.ToNumber()))
+	citationParts = append(citationParts,
+		"//", form.ParentTitle.TrimText(),
+		fmt.Sprintf("— %d.", form.YearPublished.ToNumber()))
 
 	var journalString string
 	if (form.ParentVolume.TrimText() != "") && (form.ParentNumber.TrimText() != "") {
@@ -110,27 +104,21 @@ func (form *Article) Citation() string {
 		}
 	}
 	if !(journalString == "") {
-		thirdPartElements = append(thirdPartElements, fmt.Sprintf("— %s.", journalString))
+		citationParts = append(citationParts, fmt.Sprintf("— %s.", journalString))
 	}
 
-	var pages = PageRange{
-		Start: form.PageStart.TrimText(),
-		End:   form.PageEnd.TrimText(),
-	}
-	var pagesRange = pages.StringRange()
+	var pagesRange = StringPageRange(form.PageStart.TrimText(), form.PageEnd.TrimText())
 	if !(pagesRange == "") {
-		thirdPartElements = append(thirdPartElements, fmt.Sprintf("— С. %s.", pagesRange))
+		citationParts = append(citationParts, fmt.Sprintf("— С. %s.", pagesRange))
 	}
 	if form.URL.TrimText() != "" {
 		var citationDate = time.Time.Format(time.Now(), "02.01.2006")
 		var urlString = fmt.Sprintf("— URL: %s (дата обращения: %s).", form.URL.TrimText(), citationDate)
-		thirdPartElements = append(thirdPartElements, urlString)
+		citationParts = append(citationParts, urlString)
 	}
-	journalInfoPart = strings.Join(thirdPartElements, " ")
 
 	// collect parts
-	var citationPart = []string{authorTitlePart, authorsDOIPart, journalInfoPart}
-	return strings.Join(citationPart, " ")
+	return strings.Join(citationParts, " ")
 }
 
 func (form *Article) HistoryRecordType() string {
@@ -141,17 +129,18 @@ func (form *Article) ErrorText() []string {
 }
 
 func (form *Article) ToCanvasObject() fyne.CanvasObject {
-	var authorsContainer = PeopleContainer(form.Authors, "Авторы", 3)
+	var journalSecondBlock = container.New(customLayouts.NewRatioLayout(0.25, 0.25, 0.25, 0.25),
+		form.ParentVolume, form.ParentNumber, form.PageStart, form.PageEnd)
 
-	var journalFirstBlock = container.New(NewAdaptiveGridLayoutRatio([]float32{0.6, 0.2, 0.2}),
-		form.ParentTitle, form.ParentVolume, form.ParentNumber)
-	var journalSecondBlock = container.New(NewAdaptiveGridLayoutRatio([]float32{0.4, 0.2, 0.2, 0.2}),
-		form.DOI, form.PageStart, form.PageEnd, form.YearPublished)
-	var journalInfoFields = []fyne.CanvasObject{journalFirstBlock, journalSecondBlock}
-	var journalInfoContainer = container.NewVBox(journalInfoFields...)
-	var journalContainer = container.NewVBox(widget.NewLabel("Журнал"), journalInfoContainer)
-	var formFields = []fyne.CanvasObject{form.Title, authorsContainer, journalContainer, form.URL}
-	return container.NewVBox(formFields...)
+	var formFields = []fyne.CanvasObject{
+		customLayouts.NewFormBlock("Статья", container.NewVBox(form.Title,
+			container.New(customLayouts.NewRatioLayout(0.8, 0.2), form.DOI,
+				NumberEntryWithButtons(form.YearPublished, 1425, time.Now().Year(), time.Now().Year())))),
+		customLayouts.NewFormBlock("Авторы", PeopleContainer(form.Authors)),
+		customLayouts.NewFormBlock("Журнал", container.NewVBox(form.ParentTitle, journalSecondBlock)),
+		customLayouts.NewFormBlock("Ссылка", container.NewVBox(form.URL)),
+	}
+	return container.New(customLayouts.NewFormLayout(), formFields...)
 }
 
 // NewArticleForm creates new Article object with all the required data to display entries in app

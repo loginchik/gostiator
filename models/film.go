@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/widget"
+	"gostCituations/ui/customLayouts"
 	"strings"
+	"time"
 )
 
 type Film struct {
@@ -115,18 +116,21 @@ func (form *Film) ErrorText() []string {
 }
 
 func (form *Film) ToCanvasObject() fyne.CanvasObject {
-	var basicInfoElements = []fyne.CanvasObject{form.Description, form.ContainerBox, form.Duration.Container()}
-	var basicInfoBlock = container.NewAdaptiveGrid(len(basicInfoElements), basicInfoElements...)
+	var filmInfoFirstBlock = container.New(customLayouts.NewRatioLayout(0.7, 0.3),
+		form.Title, form.Description)
+	var filmInfoSecondBlock = container.New(customLayouts.NewRatioLayout(0.3, 0.5, 0.2),
+		form.ContainerBox, form.Duration.Container(),
+		NumberEntryWithButtons(form.YearPublished, 1425, time.Now().Year(), time.Now().Year()))
+	var creatorsBlock = container.New(customLayouts.NewRatioLayout(0.5, 0.5),
+		PeopleContainer(form.Authors), form.Publishers[0].Name)
+	var distributorsBlock = OrganizationsContainer([]OrganizationForm{form.Publishers[1]})
 
-	var creatorsElements = []fyne.CanvasObject{form.Authors[0].FirstName, form.Authors[0].LastName, form.Publishers[0].Name}
-	var creatorsBlock = container.NewAdaptiveGrid(len(creatorsElements), creatorsElements...)
-	var creators = container.NewVBox(widget.NewLabel("Режиссёр и киностудия"), creatorsBlock)
-
-	var distributionElements = []fyne.CanvasObject{form.Publishers[1].Name, form.Publishers[1].Address, form.YearPublished}
-	var distributionBlock = container.NewAdaptiveGrid(len(distributionElements), distributionElements...)
-
-	var formFields = []fyne.CanvasObject{form.Title, basicInfoBlock, creators, distributionBlock}
-	return container.NewVBox(formFields...)
+	var formFields = []fyne.CanvasObject{
+		customLayouts.NewFormBlock("Фильм", container.NewVBox(filmInfoFirstBlock, filmInfoSecondBlock)),
+		customLayouts.NewFormBlock("Режиссёр и киностудия", creatorsBlock),
+		customLayouts.NewFormBlock("Дистрибутор", distributorsBlock),
+	}
+	return container.New(customLayouts.NewFormLayout(), formFields...)
 }
 
 func NewFilmForm() *Film {

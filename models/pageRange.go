@@ -2,25 +2,20 @@ package models
 
 import "fmt"
 
-type PageRange struct {
-	Start string
-	End   string
-}
-
-func (pr PageRange) StringRange() string {
-	if (pr.Start == pr.End) && (pr.Start == "") {
+func StringPageRange(start string, end string) string {
+	if (start == end) && (start == "") {
 		return ""
 	}
-
-	if pr.Start == pr.End {
-		return fmt.Sprintf("%s", pr.Start)
-	} else {
-		if !(pr.Start == "") && !(pr.End == "") {
-			return fmt.Sprintf("%s-%s", pr.Start, pr.End)
-		} else if pr.Start == "" {
-			return fmt.Sprintf("%s", pr.End)
-		} else {
-			return fmt.Sprintf("%s", pr.Start)
-		}
+	if start == end {
+		return start
 	}
+	if !(start == "") && !(end == "") {
+		return fmt.Sprintf("%s-%s", start, end)
+	}
+	if start == "" {
+		return end
+	} else {
+		return start
+	}
+
 }

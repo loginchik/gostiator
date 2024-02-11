@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
+	"gostCituations/ui/customLayouts"
 	"strings"
 	"time"
 )
@@ -26,7 +27,7 @@ func (form *WebTextForm) ExampleForm() {
 	form.DOI.Example()
 }
 
-func (form *WebTextForm) Clear() {
+func (form *WebTextForm) ClearForm() {
 	form.Title.Clear()
 	for _, a := range form.Authors {
 		a.Clear()
@@ -118,14 +119,19 @@ func (form *WebTextForm) ErrorText() []string {
 }
 
 func (form *WebTextForm) ToCanvasObject() fyne.CanvasObject {
-	var authorsContainer = PeopleContainer(form.Authors, "Авторы", 3)
-	var webSiteInfoElements = []fyne.CanvasObject{
-		form.Description, form.DayPublished, form.MonthPublished, form.YearPublished,
+	var websiteContainer = container.New(customLayouts.NewRatioLayout(0.7, 0.3),
+		form.ParentTitle, form.Description)
+	var dateContainer = container.New(customLayouts.NewRatioLayout(0.4, 0.2, 0.2, 0.2),
+		form.DOI,
+		NumberEntryWithButtons(form.DayPublished, 1, 31, 1),
+		NumberEntryWithButtons(form.MonthPublished, 1, 12, 1),
+		NumberEntryWithButtons(form.YearPublished, 1425, time.Now().Year(), time.Now().Year()))
+	var formFields = []fyne.CanvasObject{
+		customLayouts.NewFormBlock("Публикация", container.NewVBox(form.Title, dateContainer)),
+		customLayouts.NewFormBlock("Авторы", PeopleContainer(form.Authors)),
+		customLayouts.NewFormBlock("Сайт", container.NewVBox(websiteContainer, form.URL)),
 	}
-	var webSiteInfoContainer = container.NewAdaptiveGrid(len(webSiteInfoElements), webSiteInfoElements...)
-	var linksContainer = container.NewAdaptiveGrid(2, form.URL, form.DOI)
-	var formFields = []fyne.CanvasObject{form.Title, authorsContainer, form.ParentTitle, webSiteInfoContainer, linksContainer}
-	return container.NewVBox(formFields...)
+	return container.New(customLayouts.NewFormLayout(), formFields...)
 }
 
 // NewWebtextForm creates new WebTextForm object with all the required data to display entries in app

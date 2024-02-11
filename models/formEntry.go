@@ -3,6 +3,7 @@ package models
 import (
 	"fmt"
 	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
 	"math/rand"
 	"net/url"
@@ -152,6 +153,59 @@ func newNumberFormEntry(placeholder string, required bool, isYear bool) *NumberF
 	entry.SetPlaceHolder(entry.PlaceHolderText)
 	entry.ExtendBaseWidget(entry)
 	return entry
+}
+
+func updateValue(lowerLimit int, upperLimit int, newValue int) int {
+	if newValue <= lowerLimit {
+		return lowerLimit
+	}
+	if newValue >= upperLimit {
+		return upperLimit
+	}
+	return newValue
+}
+
+func NumberEntryWithButtons(numberField *NumberFormEntry, lowerLimit int, upperLimit int, startingValue int) *fyne.Container {
+	var increaseButton = widget.NewButton("+", func() {
+		if numberField.Text == "" {
+			numberField.SetText(strconv.Itoa(startingValue))
+			return
+		}
+
+		currentValue, err := strconv.ParseInt(numberField.Text, 10, 64)
+		if err != nil {
+			numberField.SetText(strconv.Itoa(startingValue))
+			return
+		} else {
+			var newValue = int(currentValue) + 1
+			var trueNewValue = updateValue(lowerLimit, upperLimit, newValue)
+			if trueNewValue != int(currentValue) {
+				numberField.SetText(strconv.Itoa(trueNewValue))
+				return
+			}
+		}
+
+	})
+	var decreaseButton = widget.NewButton("-", func() {
+		if numberField.Text == "" {
+			numberField.SetText(strconv.Itoa(startingValue))
+			return
+		}
+
+		currentValue, err := strconv.ParseInt(numberField.Text, 10, 64)
+		if err != nil {
+			numberField.SetText(strconv.Itoa(startingValue))
+			return
+		} else {
+			var newValue = int(currentValue) - 1
+			var trueNewValue = updateValue(lowerLimit, upperLimit, newValue)
+			if trueNewValue != int(currentValue) {
+				numberField.SetText(strconv.Itoa(trueNewValue))
+				return
+			}
+		}
+	})
+	return container.NewBorder(nil, nil, decreaseButton, increaseButton, numberField)
 }
 
 func newURLFormEntry(required bool) *URLFormEntry {

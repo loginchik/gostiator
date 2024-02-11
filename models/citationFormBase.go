@@ -38,7 +38,10 @@ func NewDurationForm() *DurationForm {
 }
 
 func (form *DurationForm) Container() *fyne.Container {
-	var elements = []fyne.CanvasObject{form.Hours, form.Minutes, form.Seconds}
+	var elements = []fyne.CanvasObject{
+		NumberEntryWithButtons(form.Hours, 0, 24, 1),
+		NumberEntryWithButtons(form.Minutes, 0, 60, 1),
+		NumberEntryWithButtons(form.Seconds, 0, 60, 1)}
 	return container.NewAdaptiveGrid(len(elements), elements...)
 }
 

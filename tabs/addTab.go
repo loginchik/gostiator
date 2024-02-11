@@ -15,6 +15,14 @@ import (
 // NewCitationWindow creates form window depending on models.CitationType
 // that is passed to the function
 func NewCitationWindow(t models.CitationType, application fyne.App) {
+	var windowsOpen = application.Driver().AllWindows()
+	for _, w := range windowsOpen {
+		if w.Title() == t.WindowName {
+			w.RequestFocus()
+			return
+		}
+	}
+
 	var window = application.NewWindow(t.WindowName)
 	var manualContent fyne.CanvasObject
 	switch t.SystemName {
@@ -86,5 +94,5 @@ func AddWindow(application fyne.App) *fyne.Container {
 		var cont = container.NewBorder(button, nil, nil, nil, bigLabel)
 		buttonsGrid.Add(cont)
 	}
-	return buttonsGrid
+	return container.NewCenter(buttonsGrid)
 }

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
+	"gostCituations/ui/customLayouts"
 	"strings"
 	"time"
 )
@@ -108,11 +109,8 @@ func (form *BookPartForm) Citation() string {
 		}
 		thirdPartElements = append(thirdPartElements, fmt.Sprintf("— %s, %d.", strings.Join(pubStrings, ", "), form.YearPublished.ToNumber()))
 	}
-	var pages = PageRange{
-		Start: form.PageStart.TrimText(),
-		End:   form.PageEnd.TrimText(),
-	}
-	var pagesString = pages.StringRange()
+
+	var pagesString = StringPageRange(form.PageStart.TrimText(), form.PageEnd.TrimText())
 	if !(pagesString == "") {
 		thirdPartElements = append(thirdPartElements, fmt.Sprintf("— С. %s.", pagesString))
 	}
@@ -137,12 +135,18 @@ func (form *BookPartForm) ErrorText() []string {
 }
 
 func (form *BookPartForm) ToCanvasObject() fyne.CanvasObject {
-	var authorsBlock = PeopleContainer(form.Authors, "Авторы", 3)
-	var publishersBlock = OrganizationsContainer(form.Publishers, "Издатели")
-	var bookInfoBlock = container.New(NewAdaptiveGridLayoutRatio([]float32{0.4, 0.2, 0.2, 0.2}),
-		form.DOI, form.PageStart, form.PageEnd, form.YearPublished)
-	var formFields = []fyne.CanvasObject{form.Title, authorsBlock, publishersBlock, form.ParentTitle, bookInfoBlock, form.URL}
-	return container.NewVBox(formFields...)
+	var partInfo = container.New(customLayouts.NewRatioLayout(0.7, 0.3),
+		form.DOI, NumberEntryWithButtons(form.YearPublished, 1425, time.Now().Year(), time.Now().Year()))
+	var bookInfoBlock = container.New(customLayouts.NewRatioLayout(0.6, 0.2, 0.2),
+		form.ParentTitle, form.PageStart, form.PageEnd)
+	var formFields = []fyne.CanvasObject{
+		customLayouts.NewFormBlock("Часть книги", container.NewVBox(form.Title, partInfo)),
+		customLayouts.NewFormBlock("Авторы", PeopleContainer(form.Authors)),
+		customLayouts.NewFormBlock("Книга", bookInfoBlock),
+		customLayouts.NewFormBlock("Издатели", OrganizationsContainer(form.Publishers)),
+		customLayouts.NewFormBlock("Ссылка", container.NewVBox(form.URL)),
+	}
+	return container.New(customLayouts.NewFormLayout(), formFields...)
 }
 
 // NewBookPartForm creates new BookPartForm object with all the required data to display entries in app

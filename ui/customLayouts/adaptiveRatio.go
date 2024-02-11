@@ -1,4 +1,4 @@
-package models
+package customLayouts
 
 import (
 	"fyne.io/fyne/v2"
@@ -8,7 +8,7 @@ import (
 
 var _ fyne.Layout = (*AdaptiveGridLayoutRatio)(nil)
 
-func NewAdaptiveGridLayoutRatio(ratios []float32) fyne.Layout {
+func NewRatioLayout(ratios ...float32) fyne.Layout {
 	return &AdaptiveGridLayoutRatio{ratios: ratios, adapt: true}
 }
 

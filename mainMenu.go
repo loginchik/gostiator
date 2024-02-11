@@ -55,8 +55,8 @@ func newCitationMenu(application fyne.App) *fyne.Menu {
 	return menu
 }
 
-// mainMenu creates fyne.MainMenu from the output of newCitationMenu and historyMenu.
-func mainMenu(application fyne.App) *fyne.MainMenu {
+// MainMenu creates fyne.MainMenu from the output of newCitationMenu and historyMenu.
+func MainMenu(application fyne.App) *fyne.MainMenu {
 	var menu = fyne.NewMainMenu(
 		newCitationMenu(application),
 		historyMenu(application),

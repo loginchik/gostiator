@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
+	"gostCituations/ui/customLayouts"
 	"strings"
 	"time"
 )
@@ -60,8 +61,12 @@ func (form *WebsiteForm) ErrorText() []string {
 }
 
 func (form *WebsiteForm) ToCanvasObject() fyne.CanvasObject {
-	var formFields = []fyne.CanvasObject{form.Title, form.Description, form.URL}
-	return container.NewVBox(formFields...)
+	var formFields = []fyne.CanvasObject{
+		customLayouts.NewFormBlock("Сайт", container.New(customLayouts.NewRatioLayout(0.7, 0.3),
+			form.Title, form.Description)),
+		customLayouts.NewFormBlock("Ссылка", container.NewVBox(form.URL)),
+	}
+	return container.New(customLayouts.NewFormLayout(), formFields...)
 }
 
 // NewWebsiteForm creates new WebsiteForm object with all the required data to display entries in app

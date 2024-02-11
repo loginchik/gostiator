@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
+	"gostCituations/ui/customLayouts"
 	"net/url"
 	"strings"
 	"time"
@@ -104,12 +105,17 @@ func (form *OnlineVideo) ErrorText() []string {
 }
 
 func (form *OnlineVideo) ToCanvasObject() fyne.CanvasObject {
-	var basicInfoElements = []fyne.CanvasObject{form.Description, form.YearPublished, form.Duration.Container()}
-	var basicInfoBlock = container.NewAdaptiveGrid(len(basicInfoElements), basicInfoElements...)
-	var authorBlock = PeopleContainer(form.Authors, "Автор", 1)
+	var videoInfoFirstBlock = container.New(customLayouts.NewRatioLayout(0.7, 0.3),
+		form.Title, form.Description)
+	var videoInfoSecondBlock = container.New(customLayouts.NewRatioLayout(0.4, 0.4, 0.2),
+		form.URL, form.Duration.Container(),
+		NumberEntryWithButtons(form.YearPublished, 1425, time.Now().Year(), time.Now().Year()))
 
-	var formFields = []fyne.CanvasObject{form.Title, basicInfoBlock, authorBlock, form.URL}
-	return container.NewVBox(formFields...)
+	var formFields = []fyne.CanvasObject{
+		customLayouts.NewFormBlock("Видео", container.NewVBox(videoInfoFirstBlock, videoInfoSecondBlock)),
+		customLayouts.NewFormBlock("Автор", PeopleContainer(form.Authors)),
+	}
+	return container.New(customLayouts.NewFormLayout(), formFields...)
 }
 
 func NewOnlineVideoForm() *OnlineVideo {

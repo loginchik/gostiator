@@ -59,7 +59,7 @@ var WebvideoCT = CitationType{
 var FilmCT = CitationType{
 	SystemName:  "film",
 	AppName:     "Фильм",
-	WindowName:  "Новая фильм",
+	WindowName:  "Новый фильм",
 	Description: "Фильм, мультфильм",
 }
 

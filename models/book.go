@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
+	"gostCituations/ui/customLayouts"
 	"strings"
 	"time"
 )
@@ -82,19 +83,22 @@ func (form *BookForm) ValidateForm() bool {
 }
 
 func (form *BookForm) ToCanvasObject() fyne.CanvasObject {
-	var authorsBlock = PeopleContainer(form.Authors, "Авторы", 3)
-	var editorsBlock = PeopleContainer(form.Editors, "Редакторы", 3)
-	var translatorsBlock = PeopleContainer(form.Translators, "Переводчики", 3)
-	var publishersBlock = OrganizationsContainer(form.Publishers, "Издатели")
+	var bookInfoFirstBlock = container.New(customLayouts.NewRatioLayout(0.7, 0.3),
+		form.Title, form.ISBN)
+	var bookInfoSecondBlock = container.New(customLayouts.NewRatioLayout(0.25, 0.25, 0.25, 0.25),
+		form.Edition, form.Description,
+		NumberEntryWithButtons(form.PagesCount, 1, 100000, 100),
+		NumberEntryWithButtons(form.YearPublished, 1425, time.Now().Year(), time.Now().Year()))
 
-	var bookInfoElements = []fyne.CanvasObject{form.Edition, form.Description, form.PagesCount, form.YearPublished}
-	var bookInfoLayout = NewAdaptiveGridLayoutRatio([]float32{0.3, 0.4, 0.2, 0.1})
-	var bookInfoBlock = container.New(bookInfoLayout, bookInfoElements...)
-	var otherInfoElements = []fyne.CanvasObject{form.ISBN, form.URL}
-	var otherInfoBlock = container.NewAdaptiveGrid(len(otherInfoElements), otherInfoElements...)
-
-	var formFields = []fyne.CanvasObject{form.Title, bookInfoBlock, authorsBlock, editorsBlock, translatorsBlock, publishersBlock, otherInfoBlock}
-	return container.NewVBox(formFields...)
+	var formFields = []fyne.CanvasObject{
+		customLayouts.NewFormBlock("Книга", container.NewVBox(bookInfoFirstBlock, bookInfoSecondBlock)),
+		customLayouts.NewFormBlock("Авторы", PeopleContainer(form.Authors)),
+		customLayouts.NewFormBlock("Редакторы", PeopleContainer(form.Editors)),
+		customLayouts.NewFormBlock("Переводчики", PeopleContainer(form.Translators)),
+		customLayouts.NewFormBlock("Издатели", OrganizationsContainer(form.Publishers)),
+		customLayouts.NewFormBlock("Ссылка", container.NewVBox(form.URL)),
+	}
+	return container.New(customLayouts.NewFormLayout(), formFields...)
 }
 
 func (form *BookForm) Citation() string {
@@ -201,7 +205,7 @@ func NewBookForm(authorsCount uint8, editorsCount uint8, translatorsCount uint8,
 	// year
 	form.yearField()
 	// pages count
-	form.PagesCount = newNumberFormEntry("Количество страниц", true, false)
+	form.PagesCount = newNumberFormEntry("Кол-во страниц", true, false)
 	form.PagesCount.ValidationErrors = newValidationErrors("Количество страниц", "число")
 	// isbn
 	form.ISBN = newFormEntry("ISBN", false)
