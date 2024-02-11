@@ -1,4 +1,4 @@
-package tabs
+package services
 
 import (
 	"fyne.io/fyne/v2"
@@ -7,7 +7,7 @@ import (
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 	"gostCituations/models"
-	"gostCituations/tabs/components"
+	"gostCituations/ui/components"
 )
 
 // TODO: develop file upload
@@ -22,7 +22,6 @@ func NewCitationWindow(t models.CitationType, application fyne.App) {
 			return
 		}
 	}
-
 	var window = application.NewWindow(t.WindowName)
 	var manualContent fyne.CanvasObject
 	switch t.SystemName {

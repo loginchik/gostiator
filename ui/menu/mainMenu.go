@@ -1,16 +1,16 @@
-package main
+package menu
 
 import (
 	"fyne.io/fyne/v2"
 	"gostCituations/models"
-	"gostCituations/tabs"
+	tabs2 "gostCituations/ui/services"
 )
 
 // historyMenu "Архив" fyne.Menu element.
 func historyMenu(application fyne.App) *fyne.Menu {
 	var menu = fyne.NewMenu("Архив", fyne.NewMenuItem("Показать", func() {
 		var historyWindow = application.NewWindow("Архив")
-		historyWindow.SetContent(tabs.HistoryWindow())
+		historyWindow.SetContent(tabs2.HistoryWindow())
 		historyWindow.Resize(fyne.NewSize(600, 400))
 		historyWindow.Show()
 		historyWindow.CenterOnScreen()
@@ -23,28 +23,28 @@ func historyMenu(application fyne.App) *fyne.Menu {
 // it repeats the options from app starting window, though it can be useful
 func newCitationMenu(application fyne.App) *fyne.Menu {
 	var article = fyne.NewMenuItem(models.ArticleCT.AppName, func() {
-		tabs.NewCitationWindow(models.ArticleCT, application)
+		tabs2.NewCitationWindow(models.ArticleCT, application)
 	})
 	var conference = fyne.NewMenuItem(models.ConferenceCT.AppName, func() {
-		tabs.NewCitationWindow(models.ConferenceCT, application)
+		tabs2.NewCitationWindow(models.ConferenceCT, application)
 	})
 	var book = fyne.NewMenuItem(models.BookCT.AppName, func() {
-		tabs.NewCitationWindow(models.BookCT, application)
+		tabs2.NewCitationWindow(models.BookCT, application)
 	})
 	var bookpart = fyne.NewMenuItem(models.BookPartCT.AppName, func() {
-		tabs.NewCitationWindow(models.BookPartCT, application)
+		tabs2.NewCitationWindow(models.BookPartCT, application)
 	})
 	var website = fyne.NewMenuItem(models.WebsiteCT.AppName, func() {
-		tabs.NewCitationWindow(models.WebsiteCT, application)
+		tabs2.NewCitationWindow(models.WebsiteCT, application)
 	})
 	var webtext = fyne.NewMenuItem(models.WebtextCT.AppName, func() {
-		tabs.NewCitationWindow(models.WebtextCT, application)
+		tabs2.NewCitationWindow(models.WebtextCT, application)
 	})
 	var webvideo = fyne.NewMenuItem(models.WebvideoCT.AppName, func() {
-		tabs.NewCitationWindow(models.WebvideoCT, application)
+		tabs2.NewCitationWindow(models.WebvideoCT, application)
 	})
 	var film = fyne.NewMenuItem(models.FilmCT.AppName, func() {
-		tabs.NewCitationWindow(models.FilmCT, application)
+		tabs2.NewCitationWindow(models.FilmCT, application)
 	})
 
 	var menuOptions = []*fyne.MenuItem{

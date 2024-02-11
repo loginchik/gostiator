@@ -1,4 +1,4 @@
-package tabs
+package services
 
 import (
 	"fyne.io/fyne/v2"
